@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+
+        <record model="ir.ui.view" id="addsol_region_state_view_form">
+            <field name="name">addsol.region.state.view.form</field>
+            <field name="model">addsol.region.state</field>
+            <field name="arch" type="xml">
+                <form string="Region">
+                    <group>
+                        <field name="name"/>
+                        <field name="state_id"/>
+                    </group>
+                    <group>
+                        <field name="partner_id" context="{'default_customer': 0, 'default_supplier': 0,  'search_default_stockist': 1, 'default_stockist': 1}"
+                                  domain="[('stockist', '=', True)]"/>
+                    </group>
+                </form>
+            </field>
+        </record>
+        
+        <record model="ir.ui.view" id="addsol_region_state_view_tree">
+            <field name="name">addsol.region.state.view.tree</field>
+            <field name="model">addsol.region.state</field>
+            <field name="arch" type="xml">
+                <tree string="Region">
+                    <field name="name"/>
+                    <field name="state_id"/>
+                    
+                </tree>
+            </field>
+        </record>
+        
+        <record id="open_view_addsol_region_state" model="ir.actions.act_window">
+            <field name="name">Region</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">addsol.region.state</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+
+        <record id="addsol_res_partner_view_form" model="ir.ui.view">
+            <field name="name">addsol.res.partner.view</field>
+            <field name="model">res.partner</field>
+            <field name="inherit_id" ref="base.view_partner_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//form/sheet/notebook/page/group/group/field[@name='supplier']" position="after">
+                    <field name="stockist"/>
+                </xpath>
+            </field>
+        </record>
+
+        <menuitem name="Region" action="open_view_addsol_region_state" id="menu_open_view_addsol_region_state" parent="addsol_dr.menu_pharma_config" sequence="3"/>
+
+    </data>
+</openerp>
