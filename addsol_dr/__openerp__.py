@@ -42,9 +42,10 @@ Features:
     'depends' : ['base'],
     
     'data': [
-        #'security/ir.model.access.csv',
         #'templates.xml',
         'addsol_dr_view.xml',
+        'security/addsol_dr_security.xml',
+        'security/ir.model.access.csv',
     ],
     'demo': [],
     'test': [],

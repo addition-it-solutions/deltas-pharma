@@ -1,0 +1,6 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_addsol_mr_tour_plan,MR Tour Plan,model_mr_tour_plan,base.group_addsol_mr,1,1,1,1
+access_addsol_mr_tour_plan_manager,Manager Approve Tour Plan,model_mr_tour_plan,base.group_addsol_asm,1,1,1,1
+access_dr_details,Doctor Details,model_dr_details,base.group_addsol_mr,1,1,1,1
+access_addsol_mr_tour_plan_line,MR Tour Plan Add Products,model_mr_tour_plan_line,base.group_addsol_mr,1,1,1,1
+access_addsol_mr_tour_plan_line_manager,MR Tour Plan Add Products,model_mr_tour_plan_line,base.group_addsol_asm,1,1,1,1
