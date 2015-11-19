@@ -28,9 +28,13 @@ class addsol_region_state(models.Model):
     name = fields.Char("Region Name", required=True)
     state_id = fields.Many2one('res.country.state', "State")
     partner_id = fields.Many2one('res.partner', "Stockist")
+    comment = fields.Text("Notes")
     
 
-class addsol_res_partner(models.Model):
-    _inherit = 'res.partner'
+class addsol_mr_region_mapping(models.Model):
+    _name = 'mr.region.mapping'
+    description = "Mapped MR with region"
     
-    stockist = fields.Boolean("Stockist", help="Check this box if this contact is a Stockist.")
+    user_id = fields.Many2one('res.users', "MR", default=lambda self: self.env.user)
+    state_id = fields.Many2one('res.country.state', "State")
+    region_ids = fields.Many2many('addsol.region.state', string="Region")

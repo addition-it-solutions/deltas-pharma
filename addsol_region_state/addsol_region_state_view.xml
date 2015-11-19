@@ -15,6 +15,11 @@
                         <field name="partner_id" context="{'default_customer': 0, 'default_supplier': 0,  'search_default_stockist': 1, 'default_stockist': 1}"
                                   domain="[('stockist', '=', True)]"/>
                     </group>
+                    <notebook colspan="4">
+                        <page name='internal_notes' string="Internal Notes">
+                            <field name="comment" placeholder="Put an internal note..."/>
+                        </page>
+                    </notebook>
                 </form>
             </field>
         </record>
@@ -26,7 +31,7 @@
                 <tree string="Region">
                     <field name="name"/>
                     <field name="state_id"/>
-                    
+                    <field name="partner_id"/>
                 </tree>
             </field>
         </record>
@@ -39,18 +44,48 @@
             <field name="view_mode">tree,form</field>
         </record>
 
-        <record id="addsol_res_partner_view_form" model="ir.ui.view">
-            <field name="name">addsol.res.partner.view</field>
-            <field name="model">res.partner</field>
-            <field name="inherit_id" ref="base.view_partner_form"/>
+
+        <menuitem name="Region" action="open_view_addsol_region_state" id="menu_open_view_addsol_region_state" parent="addsol_dr.menu_pharma_config" sequence="3"/>
+        
+        <record model="ir.ui.view" id="addsol_mr_region_mapping_view_tree">
+            <field name="name">addsol.mr.region.mapping.view.tree</field>
+            <field name="model">mr.region.mapping</field>
             <field name="arch" type="xml">
-                <xpath expr="//form/sheet/notebook/page/group/group/field[@name='supplier']" position="after">
-                    <field name="stockist"/>
-                </xpath>
+                <tree string="MR To Region Mapping">
+                    <field name="user_id"/>
+                    <field name="state_id"/>
+                </tree>
             </field>
         </record>
 
-        <menuitem name="Region" action="open_view_addsol_region_state" id="menu_open_view_addsol_region_state" parent="addsol_dr.menu_pharma_config" sequence="3"/>
+        <record model="ir.ui.view" id="addsol_mr_region_mapping_view_form">
+            <field name="name">addsol.mr.region.mapping.view.form</field>
+            <field name="model">mr.region.mapping</field>
+            <field name="arch" type="xml">
+                <form string="MR To Region Mapping">
+                    <sheet>
+                        <group>
+                            <field name="user_id"/>
+                            <field name="state_id"/>
+                        </group>
+                        <group>
+                            <field name="region_ids" nolabel="1"/>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <record id="open_view_addsol_mr_region_mapping" model="ir.actions.act_window">
+            <field name="name">MR To Region Mapping</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">mr.region.mapping</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+
+        <menuitem name="MR To Region Mapping" action="open_view_addsol_mr_region_mapping" id="menu_open_view_addsol_mr_region_mapping" parent="addsol_dr.menu_pharma_config" sequence="4"/>
+
 
     </data>
 </openerp>
