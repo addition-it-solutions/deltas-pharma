@@ -20,7 +20,7 @@
 ##############################################################################
 {
     'name' : 'Addsol-Doctor',
-    'summary': 'Doctor, Qualification, Speciality masters',
+    'summary': 'MR Tour Plan, Daily Call, Weekly Call',
     'description' : """
 Addition IT Solutions Pvt. Ltd.
 =================================
@@ -30,8 +30,9 @@ Addition IT Solutions Pvt. Ltd.
     
 Features:
 ---------
-    * Store doctor's information like qualification , speciality etc.
-     
+    * MR Tour Plan
+    * Daily call of Doctor, Chemist
+    *Weekly call of Stockist
 """,
 
     'author' : 'Addition IT Solutions Pvt. Ltd.',
@@ -39,13 +40,12 @@ Features:
     'category' : 'Addsol mods',
     'version' : '1.0',
     
-    'depends' : ['base'],
+    'depends' : ['base', 'addsol_region_state'],
     
     'data': [
-        #'templates.xml',
-        'addsol_dr_view.xml',
         'security/addsol_dr_security.xml',
         'security/ir.model.access.csv',
+        'addsol_dr_view.xml',
     ],
     'demo': [],
     'test': [],

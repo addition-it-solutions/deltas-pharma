@@ -31,7 +31,8 @@ Addition IT Solutions Pvt. Ltd.
 Features:
 ---------
     * Store region against state.
-     
+    * Store Qualification & Speciality of doctor
+    * Mapping of doctor, chemist , stockist , superstockist
 """,
 
     'author' : 'Addition IT Solutions Pvt. Ltd.',
@@ -39,7 +40,7 @@ Features:
     'category' : 'Addsol mods',
     'version' : '1.0',
     
-    'depends' : ['base','addsol_dr'],
+    'depends' : ['base', 'product',],
     
     'data': [
         #'security/ir.model.access.csv',
