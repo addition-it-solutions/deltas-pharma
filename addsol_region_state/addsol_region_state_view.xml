@@ -4,13 +4,13 @@
 
 
         <menuitem sequence="150" id="menu_pharma_root" name="Pharma" groups="base.group_user"/>
-        <menuitem id="menu_pharma_config" parent="menu_pharma_root" name="Configuration" sequence="100" />
+        <menuitem id="menu_pharma_config" parent="menu_pharma_root" name="Configuration" sequence="100"/>
 
         <record model="ir.ui.view" id="addsol_region_state_view_form">
             <field name="name">addsol.region.state.view.form</field>
             <field name="model">addsol.region.state</field>
             <field name="arch" type="xml">
-                <form string="Region">
+                <form string="HQ">
                     <sheet>
                         <group>
                             <group>
@@ -34,7 +34,7 @@
             <field name="name">addsol.region.state.view.tree</field>
             <field name="model">addsol.region.state</field>
             <field name="arch" type="xml">
-                <tree string="Region">
+                <tree string="HQ">
                     <field name="name"/>
                     <field name="state_id"/>
                 </tree>
@@ -42,14 +42,14 @@
         </record>
         
         <record id="open_view_addsol_region_state" model="ir.actions.act_window">
-            <field name="name">Region</field>
+            <field name="name">HQ</field>
             <field name="type">ir.actions.act_window</field>
             <field name="res_model">addsol.region.state</field>
             <field name="view_type">form</field>
             <field name="view_mode">tree,form</field>
         </record>
 
-        <menuitem name="Region" action="open_view_addsol_region_state" id="menu_open_view_addsol_region_state" parent="menu_pharma_config" sequence="3"/>
+        <menuitem name="HQ" action="open_view_addsol_region_state" id="menu_open_view_addsol_region_state" parent="menu_pharma_config" sequence="3"/>
 
 
         <!-- Doctor Qualification -->
@@ -93,9 +93,20 @@
             <field name="model">dr.speciality</field>
             <field name="arch" type="xml">
                 <form string="Speciality">
-                    <group col="4">
-                        <field name="name"/>
+                    <group>
+                        <group>
+                            <field name="name"/>
+                        </group>
                     </group>
+                    <notebook>
+                        <page string="Product">
+                            <field name="dr_speciality_product_line_ids" nolable="1">
+                                <tree editable="bottom">
+                                    <field name="product_id" />
+                                </tree>
+                            </field>
+                        </page>
+                    </notebook>
                 </form>
             </field>
         </record>
@@ -154,7 +165,7 @@
             <field name="model">res.users</field>
             <field name="inherit_id" ref="base.view_users_form"/>
             <field name="arch" type="xml">
-                <xpath expr="//form/sheet/notebook/page/group/group/field[@name='action_id']" position="after">
+                <xpath expr="//form/sheet/notebook/page/group/group/field[@name='tz']" position="after">
                     <field name="region_id"/>
                 </xpath>
             </field>
@@ -182,156 +193,38 @@
                     <page string="Speciality" attrs="{'invisible': [('doctor','!=',True)] }">
                         <field name="spec_ids" nolabel="1"/>
                     </page>
-                    <page string="Region" attrs="{'invisible': [('doctor','!=',True), ('stockist','!=',True), ('chemist','!=',True), ('superstockist','!=',True)] }">
+                    <page string="HQ" attrs="{'invisible': [('doctor','!=',True), ('stockist','!=',True), ('chemist','!=',True), ('superstockist','!=',True)] }">
                         <field name="region_ids" nolabel="1"/>
+                    </page>
+                    <page string="Chemist Mapping" attrs="{'invisible': [('doctor','!=',True)] }">
+                        <field name="doctor_chemist_mapping_line_ids"> nolabel="1">
+                            <tree editable="bottom">
+                                <field name="chemist_partner_id" nolabel="1" context="{'default_chemist': 1}"
+                                        domain="[('chemist', '=', True)]"/>
+                                <field name="preferred_flag"/>
+                            </tree>
+                        </field>
+                    </page>
+                    <page string="Chemist Mapping" attrs="{'invisible': [('stockist','!=',True)] }">
+                        <field name="stockist_chemist_mapping_line_ids"> nolabel="1">
+                            <tree editable="bottom">
+                                <field name="chemist_partner_id" nolabel="1" context="{'default_chemist': 1}"
+                                        domain="[('chemist', '=', True)]"/>
+                            </tree>
+                        </field>
+                    </page>
+                    <page string="Stockist Mapping" attrs="{'invisible': [('superstockist','!=',True)] }">
+                        <field name="superstockist_stockist_mapping_line_ids"> nolabel="1">
+                            <tree editable="bottom">
+                                <field name="stockist_partner_id" nolabel="1" context="{'default_stockist': 1}"
+                                        domain="[('stockist', '=', True)]"/>
+                            </tree>
+                        </field>
                     </page>
                 </xpath>
             </field>
         </record>
         <!--End-->
-
-        <!-- Doctor to Chemist mapping -->
-
-        <record id="doctor_chemist_mapping_view_form" model="ir.ui.view" >
-            <field name="name">doctor.chemist.mapping.view.form</field>
-            <field name="model">doctor.chemist.mapping</field>
-            <field name="arch" type="xml">
-                <form string="Doctor Chemist Mapping">
-                    <sheet>
-                        <group>
-                            <field name="dr_partner_id" required="1"  domain="[('doctor', '=', True)]"/>
-                        </group>
-                        <notebook>
-                            <page string="Chemist">
-                                <field name="doctor_chemist_mapping_ids" nolabel="1">
-                                    <tree editable="bottom">
-                                        <field name="chemist_partner_id" nolabel="1" context="{'default_chemist': 1, 'partner_id': parent.dr_partner_id }"
-                                                domain="[('chemist', '=', True)]"/>
-                                        <field name="preferred_flag"/>
-                                    </tree>
-                                </field>
-                            </page>
-                        </notebook>
-                    </sheet>
-                </form>
-            </field>
-        </record>
-
-        <record id="doctor_chemist_mapping_view_tree" model="ir.ui.view" >
-            <field name="name">doctor.chemist.mapping.view.tree</field>
-            <field name="model">doctor.chemist.mapping</field>
-            <field name="arch" type="xml">
-                <tree string="Doctor To Chemist Mapping">
-                    <field name="dr_partner_id"/>
-                </tree>
-            </field>
-        </record>
-
-        <record id="open_view_doctor_chemist_mapping" model="ir.actions.act_window">
-            <field name="name">Doctor Chemist Mapping</field>
-            <field name="type">ir.actions.act_window</field>
-            <field name="res_model">doctor.chemist.mapping</field>
-            <field name="view_type">form</field>
-            <field name="view_mode">tree,form</field>
-        </record>
-
-        <menuitem name="Doctor Chemist Mapping" action="open_view_doctor_chemist_mapping" id="menu_open_view_doctor_chemist_mapping" parent="menu_pharma_config" sequence="4"/>
-        <!-- End -->
-
-        <!-- Stockist to Chemist mapping -->
-
-        <record id="stockist_chemist_mapping_view_form" model="ir.ui.view" >
-            <field name="name">stockist.chemist.mapping.view.form</field>
-            <field name="model">stockist.chemist.mapping</field>
-            <field name="arch" type="xml">
-                <form string="Stockist Chemist Mapping">
-                    <sheet>
-                        <group>
-                            <field name="stockist_partner_id" required="1"  domain="[('stockist', '=', True)]" />
-                        </group>
-                        <notebook>
-                            <page string="Chemist">
-                                <field name="stockist_chemist_mapping_ids" nolabel="1">
-                                    <tree editable="bottom">
-                                        <field name="chemist_partner_id" nolabel="1" context="{'default_chemist': 1, 'partner_id': parent.stockist_partner_id}"
-                                                domain="[('chemist', '=', True)]"/>
-                                    </tree>
-                                </field>
-                            </page>
-                        </notebook>
-                    </sheet>
-                </form>
-            </field>
-        </record>
-
-        <record id="stockist_chemist_mapping_view_tree" model="ir.ui.view" >
-            <field name="name">stockist.chemist.mapping.view.tree</field>
-            <field name="model">stockist.chemist.mapping</field>
-            <field name="arch" type="xml">
-                <tree string="Stockist Chemist Mapping">
-                    <field name="stockist_partner_id"/>
-                </tree>
-            </field>
-        </record>
-
-        <record id="open_view_stockist_chemist_mapping" model="ir.actions.act_window">
-            <field name="name">Stockist Chemist Mapping</field>
-            <field name="type">ir.actions.act_window</field>
-            <field name="res_model">stockist.chemist.mapping</field>
-            <field name="view_type">form</field>
-            <field name="view_mode">tree,form</field>
-        </record>
-
-        <menuitem name="Stockist Chemist Mapping" action="open_view_stockist_chemist_mapping" id="menu_open_view_stockist_chemist_mapping" parent="menu_pharma_config" sequence="5"/>
-        <!-- End -->
-
-
-        <!-- SuperStockist to Stockist mapping -->
-
-        <record id="super_stockist_mapping_view_form" model="ir.ui.view" >
-            <field name="name">super.stockist.mapping.view.form</field>
-            <field name="model">super.stockist.mapping</field>
-            <field name="arch" type="xml">
-                <form string="SuperStockist Stockist Mapping">
-                    <sheet>
-                        <group>
-                            <field name="super_partner_id" required="1"  domain="[('superstockist', '=', True)]" />
-                        </group>
-                        <notebook>
-                            <page string="Stockist">
-                                <field name="super_stockist_mapping_ids" nolabel="1">
-                                    <tree editable="bottom">
-                                        <field name="stockist_partner_id" nolabel="1" context="{'default_stockist': 1, 'partner_id': parent.super_partner_id}"
-                                                domain="[('stockist', '=', True)]"/>
-                                    </tree>
-                                </field>
-                            </page>
-                        </notebook>
-                    </sheet>
-                </form>
-            </field>
-        </record>
-
-        <record id="super_stockist_mapping_view_tree" model="ir.ui.view" >
-            <field name="name">super.stockist.mapping.view.tree</field>
-            <field name="model">super.stockist.mapping</field>
-            <field name="arch" type="xml">
-                <tree string="SuperStockist Stockist Mapping">
-                    <field name="super_partner_id"/>
-                </tree>
-            </field>
-        </record>
-
-        <record id="open_view_super_stockist_mapping" model="ir.actions.act_window">
-            <field name="name">SuperStockist Stockist Mapping</field>
-            <field name="type">ir.actions.act_window</field>
-            <field name="res_model">super.stockist.mapping</field>
-            <field name="view_type">form</field>
-            <field name="view_mode">tree,form</field>
-        </record>
-
-        <menuitem name="SuperStockist Stockist Mapping" action="open_view_super_stockist_mapping" id="menu_open_view_super_stockist_mapping" parent="menu_pharma_config" sequence="6"/>
-        <!-- End -->
 
         <!-- Product Scheme master -->
         <record id="scheme_product_view_form" model="ir.ui.view" >
@@ -352,7 +245,7 @@
                             </group>
                         </group>
                         <notebook>
-                            <page string="Region">
+                            <page string="HQ">
                                 <field name="scheme_region_ids">
                                     <tree editable="bottom">
                                         <field name="addsol_region_state_id"/>
@@ -392,9 +285,173 @@
             <field name="view_mode">tree,form</field>
         </record>
 
-        <menuitem name="Scheme Master" id="menu_open_view_scheme_product" action="open_view_scheme_product"  parent="menu_pharma_config"  sequence="7"/>
+        <menuitem name="Scheme Master" id="menu_open_view_scheme_product" action="open_view_scheme_product"  parent="menu_pharma_config"  sequence="8"/>
 
+
+        <!-- Alert Master -->
+        <record id="addsol_alert_type_view_form" model="ir.ui.view" >
+            <field name="name">addsol.alert.type.view.form</field>
+            <field name="model">alert.type</field>
+            <field name="arch" type="xml">
+                <form string="Alert Type">
+                    <sheet>
+                        <group>
+                            <group>
+                                <field name="name"/>
+                            </group>
+                        </group>
+                        <notebook colspan="4">
+                            <page string="Description">
+                                <field name="description"/>
+                            </page>
+                        </notebook>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+        
+        <record id="addsol_alert_type_view_tree" model="ir.ui.view" >
+            <field name="name">addsol.alert.type.view.tree</field>
+            <field name="model">alert.type</field>
+            <field name="arch" type="xml">
+                <tree string="Alert Type">
+                    <field name="name"/>
+                </tree>
+            </field>
+        </record>
+        
+        <record id="open_view_addsol_alert_type" model="ir.actions.act_window">
+            <field name="name">Alert Type</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">alert.type</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+
+        <menuitem action="open_view_addsol_alert_type" id="menu_open_view_addsol_alert_type" parent="menu_pharma_config" sequence="9"/>
+
+        <record id="addsol_alert_view_form" model="ir.ui.view" >
+            <field name="name">addsol.alert.view.form</field>
+            <field name="model">alert</field>
+            <field name="arch" type="xml">
+                <form string="Alert">
+                    <sheet>
+                        <group>
+                            <group>
+                                <field name="alert_type_id"/>
+                            </group>
+                        </group>
+                        <group>
+                            <group>
+                                <field name="start_date"/>
+                                <field name="short_msg"/>
+                                <field name="is_active"/>
+                            </group>
+                            <group>
+                                <field name="end_date"/>
+                                <field name="long_msg"/>
+                            </group>
+                        </group>
+                        <group string="Send Via">
+                            <group>
+                                <field name="is_email"/>
+                                <field name="is_messageboard"/>
+                            </group>
+                            <group>
+                                <field name="is_sms"/>
+                            </group>
+                        </group>
+                        <notebook>
+                            <page string="Users">
+                                <field name="alert_user_ids" nolable="1">
+                                    <tree editable="bottom">
+                                        <field name="user_id" />
+                                    </tree>
+                                </field>
+                            </page>
+                        </notebook>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+        
+        <record id="addsol_alert_view_tree" model="ir.ui.view" >
+            <field name="name">addsol.alert.view.tree</field>
+            <field name="model">alert</field>
+            <field name="arch" type="xml">
+                <tree string="Alert Type">
+                    <field name="alert_type_id"/>
+                    <field name="start_date"/>
+                    <field name="end_date"/>
+                    <field name="short_msg"/>
+                    <field name="is_active"/>
+                    <field name="is_email"/>
+                    <field name="is_sms"/>
+                </tree>
+            </field>
+        </record>
+        
+        <record id="open_view_addsol_alert" model="ir.actions.act_window">
+            <field name="name">Alert</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">alert</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+
+        <menuitem action="open_view_addsol_alert" id="menu_open_view_addsol_alert" parent="menu_pharma_config" sequence="10"/>
+
+        <!-- End -->
 
         
+        <!-- Note Master -->
+        <record id="addsol_note_type_view_form" model="ir.ui.view" >
+            <field name="name">addsol.note.type.view.form</field>
+            <field name="model">note.type</field>
+            <field name="arch" type="xml">
+                <form string="Note Type">
+                    <sheet>
+                        <group>
+                            <group>
+                                <field name="name"/>
+                            </group>
+                        </group>
+                        <notebook>
+                            <page string="Notes">
+                                <field name="note_type_line_ids" nolable="1">
+                                    <tree editable="bottom">
+                                        <field name="name" />
+                                        <field name="description" />
+                                    </tree>
+                                </field>
+                            </page>
+                        </notebook>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+        
+        <record id="addsol_note_type_view_tree" model="ir.ui.view" >
+            <field name="name">addsol.note.type.view.tree</field>
+            <field name="model">note.type</field>
+            <field name="arch" type="xml">
+                <tree string="Note Type">
+                    <field name="name"/>
+                </tree>
+            </field>
+        </record>
+        
+        <record id="open_view_addsol_note_type" model="ir.actions.act_window">
+            <field name="name">Note Type</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">note.type</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+
+        <menuitem action="open_view_addsol_note_type" id="menu_open_view_addsol_note_type" parent="menu_pharma_config" sequence="11"/>
+        <!-- End -->
+
+
     </data>
 </openerp>

@@ -21,6 +21,7 @@
 
 from openerp import models, fields, api, _
 from datetime import date,timedelta
+import openerp.addons.decimal_precision as dp
 
 
 class mr_tour_plan(models.Model):
@@ -31,12 +32,10 @@ class mr_tour_plan(models.Model):
     employee_id = fields.Many2one('hr.employee', "MR")
     tour_date = fields.Date("Date")
     tour_date_to = fields.Date("Date To")
-    doctor_line_ids = fields.One2many('mr.tour.plan.line', 'tour_id', "Doctor", states={'draft': [('readonly', False)],'confirm': [('readonly', False)]} , readonly=True)
-    state = fields.Selection([('draft', 'To Submit'), ('cancel', 'Cancelled'),('confirm', 'To Approve'), ('validate', 'Approved'), ('refuse', 'Refused')], 'Status', readonly=True)
-    chemist_partner_ids = fields.Many2many('res.partner', 'mr_tour_plan_chemist' , 'mr_tour_plane_chemist_id', 'partner_id', string='Chemists', states={'draft': [('readonly', False)], 'confirm': [('readonly', False)]} , readonly=True)
-    stockist_partner_ids = fields.Many2many('res.partner', 'mr_tour_plan_stockist' , 'mr_tour_plane_stockist_id', 'partner_id', string='Stockists', states={'draft': [('readonly', False)], 'confirm': [('readonly', False)]} , readonly=True)
-    work_with_whom_ids = fields.Many2many('hr.employee', 'mr_tour_plan_work_with_whom', 'mr_tour_plan_work_id', 'employee_id', string='Work With Whom', states={'draft': [('readonly', False)], 'confirm': [('readonly', False)]} , readonly=True)
-     
+    is_approved = fields.Boolean()
+    approved_date = fields.Datetime()
+    notes = fields.Text("Notes")
+    
     @api.cr_uid_ids_context
     def _employee_get(self, cr, uid, context=None):
         emp_id = context.get('default_employee_id', False)
@@ -48,46 +47,73 @@ class mr_tour_plan(models.Model):
         return False
      
     _defaults = {
-     'state' : 'draft',
      'employee_id' : _employee_get
      }
+
+class mr_tour_plan_doctor(models.Model):
+    _name = 'mr.tour.plan.doctor'
          
-    @api.one
-    def plan_send(self):
-        self.write({'state': 'confirm'})
-        return True
-         
-    @api.one
-    def plan_approve_asm(self):
-        self.write({'state': 'validate'})
-        return True
-    
-#     @api.one
-#     def plan_approve_rsm(self):
-#         self.write({'state': 'validate'})
-#         return True
-    
-    @api.one
-    def refuse(self):
-        self.write({'state': 'refuse'})
-        return True
-         
-    @api.one
-    def reset(self):
-        self.write({'state': 'cancel'})
-        return True
-         
-         
-class mr_tour_plan_line(models.Model):
-    _name = 'mr.tour.plan.line'
-         
-    tour_id = fields.Many2one('mr.tour.plan')
+    tour_id = fields.Many2one('mr.tour.plan', "Tour Plan")
     dr_partner_id = fields.Many2one('res.partner', "Doctor")
-    plan_line_product_id = fields.Many2many('product.product', 'mr_tour_plan_line_product' , 'mr_tour_plane_line_id', 'product_id', string='Products')
-    notes = fields.Text("Notes")
-    sampling = fields.Text("Sampling")
-    promotional = fields.Text("Promotional")
+    plan_doctor_work_with_line_ids = fields.One2many('plan.doctor.work.with.line', 'plan_doctor_id', "Work with whom")
+    plan_doctor_product_line_ids = fields.One2many('plan.doctor.product.line', 'plan_doctor_id', "Plan Product")
+    plan_doctor_samples_line_ids = fields.One2many('plan.doctor.samples.line', 'plan_doctor_id', "Plan Samples")
+    plan_doctor_promotional_line_ids = fields.One2many('plan.doctor.promotional.line', 'plan_doctor_id', "Plan Promotional")
     
+    
+class plan_doctor_work_with_line(models.Model):
+    _name = 'plan.doctor.work.with.line'
+    
+    plan_doctor_id = fields.Many2one('mr.tour.plan.doctor')
+    employee_id = fields.Many2one('hr.employee', "Work with whom")
+    
+class plan_doctor_product_line(models.Model):
+    _name = 'plan.doctor.product.line'
+    
+    plan_doctor_id = fields.Many2one('mr.tour.plan.doctor')
+    product_id = fields.Many2one('product.product', "Product")
+    
+class plan_doctor_samples_line(models.Model):
+    _name = 'plan.doctor.samples.line'
+    
+    plan_doctor_id = fields.Many2one('mr.tour.plan.doctor')
+    product_id = fields.Many2one('product.product', "Sample Product")
+    sample_qty = fields.Integer("Quantity", default=0)
+
+class plan_doctor_promotional_line(models.Model):
+    _name = 'plan.doctor.promotional.line'
+    
+    plan_doctor_id = fields.Many2one('mr.tour.plan.doctor')
+    product_id = fields.Many2one('product.product', "Promotional Product")
+    promotional_qty = fields.Integer("Quantity", default=0)
+
+class mr_tour_plan_chemist(models.Model):
+    _name = 'mr.tour.plan.chemist'
+    
+    tour_id = fields.Many2one('mr.tour.plan', "Tour Plan")
+    chemist_partner_id = fields.Many2one('res.partner', "Chemist")
+    plan_chemist_work_with_line_ids = fields.One2many('plan.chemist.work.with.line', 'plan_chemist_id', "Work with whom")
+    
+    
+class plan_chemist_work_with_line(models.Model):
+    _name = 'plan.chemist.work.with.line'
+      
+    plan_chemist_id = fields.Many2one('mr.tour.plan.chemist', string='Chemist Reference')
+    employee_id = fields.Many2one('hr.employee', "Work with whom")
+     
+class mr_tour_plan_stockist(models.Model):
+    _name = 'mr.tour.plan.stockist'
+    
+    tour_id = fields.Many2one('mr.tour.plan', "Tour Plan")
+    stockist_partner_id = fields.Many2one('res.partner', "Stockist")
+    plan_stockist_work_with_line_ids = fields.One2many('plan.stockist.work.with.line', 'plan_stockist_id', "Work with whom")
+      
+class plan_stockist_work_with_line(models.Model):
+    _name = 'plan.stockist.work.with.line'
+      
+    plan_stockist_id = fields.Many2one('mr.tour.plan.stockist', string='Chemist Reference')
+    employee_id = fields.Many2one('hr.employee', "Work with whom")
+
 
 class mr_daily_doctor_call(models.Model): 
     _name = 'mr.daily.doctor.call'
@@ -98,9 +124,6 @@ class mr_daily_doctor_call(models.Model):
     call_date = fields.Date("Date", default=date.today())
     dr_partner_id = fields.Many2one('res.partner', "Doctor")
     call_product_line_ids = fields.One2many('mr.daily.doctor.call.line', 'doctor_call_id', "Product")
-    brochure_product_line_ids = fields.One2many('mr.daily.doctor.brochure.line', 'doctor_call_brochure_id', "Brochure")
-    catalogs_product_line_ids = fields.One2many('mr.daily.doctor.catalog.line', 'doctor_call_catalog_id', "Catalogs")
-    promotional_material_line_ids = fields.One2many('mr.daily.doctor.pmaterial.line', 'doctor_call_pmaterial_id', "Promotional Material")
     remark = fields.Text("Remark")
     unplanned_doctor = fields.Boolean("Unplanned Doctor", help="Check this box if doctor is not in planned list")
     telephonic_flag = fields.Boolean("Telephonic Call")
@@ -131,27 +154,6 @@ class mr_daily_doctor_call_line(models.Model):
     chemist_qty = fields.Integer("Chemist Quantity", default=0, readonly=True)
     stockist_qty = fields.Integer("Stockist Quantity", default=0, readonly=True)
     scheme_product_id = fields.Many2one('scheme.product', "Scheme")
-    
-class mr_daily_doctor_brochure_line(models.Model):
-    _name = 'mr.daily.doctor.brochure.line'
-    
-    doctor_call_brochure_id = fields.Many2one('mr.daily.doctor.call')
-    product_id = fields.Many2one('product.product', "Product", domain=[('brochure','=',True)])
-    brochure_qty = fields.Integer("Quantity", default=0)
-    
-class mr_daily_doctor_catalog_line(models.Model):
-    _name = 'mr.daily.doctor.catalog.line'
-    
-    doctor_call_catalog_id = fields.Many2one('mr.daily.doctor.call')
-    product_id = fields.Many2one('product.product', "Product", domain=[('catalogs','=',True)])
-    catalogs_qty = fields.Integer("Quantity", default=0)
-    
-class mr_daily_doctor_pmaterial_line(models.Model):
-    _name = 'mr.daily.doctor.pmaterial.line'
-    
-    doctor_call_pmaterial_id = fields.Many2one('mr.daily.doctor.call')
-    product_id = fields.Many2one('product.product', "Product", domain=[('promotional_material','=',True)])
-    promotional_material_qty = fields.Integer("Quantity", default=0)
     
     
 class mr_daily_chemist_call(models.Model):
@@ -275,3 +277,28 @@ class weekly_stockist_chemistwise_product(models.Model):
     product_id = fields.Many2one('product.product', "Product")
     quantity = fields.Integer("Quantity", default=0)
     
+class incentive_type(models.Model):
+    _name = 'incentive.type'
+    
+    name = fields.Char("Name")
+    description = fields.Text("Description")
+    
+class incentive(models.Model):
+    _name = 'incentive'
+    _rec_name = 'incentive_date'
+    
+    incentive_type_id = fields.Many2one('incentive.type', "Incentive Type")
+    incentive_date = fields.Date("Date")
+    employee_id = fields.Many2one('hr.employee', "Employee")
+    amount = fields.Float("Amount", digits_compute=dp.get_precision('Product Price'))
+    remark = fields.Text("Remark")
+    
+    
+class disbursement(models.Model):
+    _name = 'disbursement'
+    _rec_name = 'disbursement_date'
+    
+    disbursement_date = fields.Date("Date")
+    employee_id = fields.Many2one('hr.employee', "Employee")
+    amount = fields.Float("Amount", digits_compute=dp.get_precision('Product Price'))
+    remark = fields.Text("Remark")

@@ -43,7 +43,8 @@ Features:
     'depends' : ['base', 'product',],
     
     'data': [
-        #'security/ir.model.access.csv',
+        'security/addsol_region_state_security.xml',
+        'security/ir.model.access.csv',
         #'templates.xml',
         'addsol_region_state_view.xml',
     ],
