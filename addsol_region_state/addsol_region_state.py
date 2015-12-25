@@ -140,12 +140,14 @@ class scheme_product_region_line(models.Model):
      
     region_scheme_product_id = fields.Many2one('scheme.product')
     addsol_region_state_id = fields.Many2one('addsol.region.state', "HQ Name")
+    notes = fields.Text("Notes")
      
 class scheme_product_product_line(models.Model):
     _name = 'scheme.product.product.line'
       
     scheme_product_product_id = fields.Many2one('scheme.product')
     product_id = fields.Many2one('product.product', "Name")
+    notes = fields.Text("Notes")
 
 class alert_type(models.Model):
     _name = 'alert.type'
