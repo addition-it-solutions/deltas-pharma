@@ -23,12 +23,51 @@ from openerp import models, fields, api, _
     
 class addsol_goals(models.Model):
     _name = 'addsol.goals'
+    _rec_name = 'period_id'
     
-    
-    name = fields.Char("Name", required=True)
-    user_id = fields.Many2one('res.users', string="Salesperson", required=True)
+    #name = fields.Char("Name", required=True)
+    #user_id = fields.Many2one('res.users', string="Salesperson", required=True)
     period_id = fields.Many2one('addsol.date.periods', "Period", required=True)
     product_line_ids = fields.One2many('addsol.target.products','target_id', 'Product Lines')
+    
+    @api.one
+    def copy(self, default=None):
+        # this is used for create copy or duplicate record
+        target_product = []
+        for goal_ids in self.browse(self.ids):
+            if default is None:
+                default = {}
+            for line in goal_ids.product_line_ids:
+                new_line = line.copy()
+                target_product.append(new_line.id)
+            default['product_line_ids'] = [(6,0,target_product)]
+            res = super(addsol_goals,self).copy(default=default)
+        return res
+    
+class addsol_target_products(models.Model):
+    _name = 'addsol.target.products'
+    
+    target_id = fields.Many2one('addsol.goals')
+    product_id = fields.Many2one('product.product', "Product", required=True)
+    quantity = fields.Integer("Target Quantity", required=True)
+
+
+class addsol_date_periods(models.Model):
+    _name = 'addsol.date.periods'
+    
+    name = fields.Char("Name", required=True)
+    st_date = fields.Date("Start date", required=True)
+    ed_date = fields.Date("End Date", required=True)
+
+
+class projection(models.Model):
+    _name = 'projection'
+    
+    name = fields.Char("Name")
+    user_id = fields.Many2one('res.users', "Salesperson")
+    period_id = fields.Many2one('addsol.date.periods', "Period")
+    projection_line_ids = fields.One2many('projection.line', 'projection_id', "Projection Lines")
+    
     
     @api.one
     @api.constrains('period_id')
@@ -52,35 +91,18 @@ class addsol_goals(models.Model):
         for goal_ids in self.browse(self.ids):
             if default is None:
                 default = {}
-            for line in goal_ids.product_line_ids:
+            for line in goal_ids.projection_line_ids:
                 new_line = line.copy()
                 target_product.append(new_line.id)
             default['user_id'] = 1
-            default['product_line_ids'] = [(6,0,target_product)]
-            res = super(addsol_goals,self).copy(default=default)
+            default['projection_line_ids'] = [(6,0,target_product)]
+            res = super(projection,self).copy(default=default)
         return res
     
-class addsol_target_products(models.Model):
-    _name = 'addsol.target.products'
+class projection_line(models.Model):
+    _name = 'projection.line'
     
-    target_id = fields.Many2one('addsol.goals')
-    product_id = fields.Many2one('product.product', "Product", required=True)
-    projection_qty = fields.Integer("Projection Quantity", required=True)
-    quantity = fields.Integer("Goals Quantity", required=True)
-
-
-class addsol_date_periods(models.Model):
-    _name = 'addsol.date.periods'
-    
-    name = fields.Char("Name", required=True)
-    st_date = fields.Date("Start date", required=True)
-    ed_date = fields.Date("End Date", required=True)
-
-class addsol_res_users(models.Model):
-    # Inherits user for add it on addsol.goals
-    _inherit = 'res.users'
-
-    goal_ids = fields.One2many('addsol.goals', 'user_id', string='Goals',
-        readonly=True, copy=False)
-
+    projection_id = fields.Many2one('projection')
+    product_id = fields.Many2one('product.product', "Product")
+    projection_qty = fields.Integer("Projection Quantity")
 # vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:
