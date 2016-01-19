@@ -39,7 +39,7 @@ Features:
     'category' : 'Addsol mods',
     'version' : '1.0',
     
-    'depends' : ['sale'],
+    'depends' : ['addsol_region_state'],
     
     'data': [
         'security/ir.model.access.csv',
