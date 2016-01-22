@@ -42,7 +42,7 @@ Features:
     
     'data': [
         #'security/addsol_region_state_security.xml',
-        #'security/ir.model.access.csv',
+        'security/ir.model.access.csv',
         #'templates.xml',
         'addsol_secondary_movement_view.xml',
     ],
