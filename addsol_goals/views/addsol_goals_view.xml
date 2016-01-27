@@ -90,7 +90,7 @@
 
         <record id="view_projection_form" model="ir.ui.view" >
             <field name="name">view.projection.form</field>
-            <field name="model">projection</field>
+            <field name="model">addsol.projection</field>
             <field name="arch" type="xml">
                 <form string="Projection">
                     <sheet>
@@ -120,7 +120,7 @@
 
         <record id="projection_view_tree" model="ir.ui.view" >
             <field name="name">projection.view.tree</field>
-            <field name="model">projection</field>
+            <field name="model">addsol.projection</field>
             <field name="arch" type="xml">
                 <tree string="Projection" >
                     <field name="name"/>
@@ -133,7 +133,7 @@
         <record id="open_view_projection" model="ir.actions.act_window">
             <field name="name">Projection</field>
             <field name="type">ir.actions.act_window</field>
-            <field name="res_model">projection</field>
+            <field name="res_model">addsol.projection</field>
             <field name="view_type">form</field>
             <field name="view_mode">tree,form</field>
         </record>

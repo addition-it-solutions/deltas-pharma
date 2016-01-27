@@ -60,13 +60,13 @@ class addsol_date_periods(models.Model):
     ed_date = fields.Date("End Date", required=True)
 
 
-class projection(models.Model):
-    _name = 'projection'
+class addsol_projection(models.Model):
+    _name = 'addsol.projection'
     
     name = fields.Char("Name")
     user_id = fields.Many2one('res.users', "Salesperson")
     period_id = fields.Many2one('addsol.date.periods', "Period")
-    projection_line_ids = fields.One2many('projection.line', 'projection_id', "Projection Lines")
+    projection_line_ids = fields.One2many('addsol.projection.line', 'projection_id', "Projection Lines")
     
     
     @api.one
@@ -96,13 +96,13 @@ class projection(models.Model):
                 target_product.append(new_line.id)
             default['user_id'] = 1
             default['projection_line_ids'] = [(6,0,target_product)]
-            res = super(projection,self).copy(default=default)
+            res = super(addsol_projection,self).copy(default=default)
         return res
     
-class projection_line(models.Model):
-    _name = 'projection.line'
+class addsol_projection_line(models.Model):
+    _name = 'addsol.projection.line'
     
-    projection_id = fields.Many2one('projection')
+    projection_id = fields.Many2one('addsol.projection')
     product_id = fields.Many2one('product.product', "Product")
     projection_qty = fields.Integer("Projection Quantity")
 # vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:
