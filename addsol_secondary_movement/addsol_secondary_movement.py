@@ -30,6 +30,8 @@ class secondary_movement(models.Model):
     partner_id = fields.Many2one('res.partner', "Superstockist", required=True)
     movement_date = fields.Date("Date", default=date.today())
     stockist_partner_id = fields.Many2one('res.partner', "Stockist")
+    sale_amount = fields.Float("Sale Amount", defualt=0.0)
+    collection_amount = fields.Float("Collection Amount", default=0.0)
     secondary_movement_line_ids = fields.One2many('secondary.movement.line', 'secondary_movement_id', "Stockistwise Movement")
     
     

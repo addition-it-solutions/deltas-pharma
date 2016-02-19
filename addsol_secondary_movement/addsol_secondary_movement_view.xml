@@ -17,6 +17,12 @@
                             <group>
                                 <field name="movement_date"/>
                             </group>
+                            <group>
+                                <field name="sale_amount"/>
+                            </group>
+                            <group>
+                                <field name="collection_amount"/>
+                            </group>
                         </group>
                         <notebook>
                             <page string="Secondary Movement">
@@ -40,8 +46,11 @@
             <field name="model">secondary.movement</field>
             <field name="arch" type="xml">
                 <tree string="Secondary Movement">
-                    <field name="partner_id"/>
                     <field name="movement_date"/>
+                    <field name="partner_id"/>
+                    <field name="stockist_partner_id"/>
+                    <field name="sale_amount"/>
+                    <field name="collection_amount"/>
                 </tree>
             </field>
         </record>
